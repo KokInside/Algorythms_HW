@@ -1,0 +1,42 @@
+# Visual Studio / common
+.vs/
+*.suo
+*.user
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.opendb
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+build/
+out/
+Debug/
+Release/
+x64/
+x86/
+
+# Compiled files / libraries / executables
+*.exe
+*.dll
+*.so
+*.lib
+*.obj
+*.o
+*.a
+*.idb
+*.pdb
+
+# Intellisense / precompiled headers / caches
+.ipch/
+*.iobj
+*.cache
+*.log
+*.lastbuildstate
+
+# Other OS/editor cruft
+*.DS_Store
+Thumbs.db
+*.log
+*.swp
