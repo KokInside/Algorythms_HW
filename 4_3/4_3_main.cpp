@@ -1,5 +1,6 @@
 ﻿#include <iostream>
 #include <stdexcept>
+#include <assert.h>
 
 /*
 4.3. Планировщик процессов
@@ -31,9 +32,18 @@
 Кол-во переключений процессора.
 */
 
+// шаблонный swap
+// не знаю, можно ли использовать std::move
+template<typename T>
+void swap(T& pr1, T& pr2) {
+	T tmp = pr1;
+	pr1 = pr2;
+	pr2 = tmp;
+}
+
 // структура процесса
 struct process {
-	process(const int& init_P, const int& init_T) : P(init_P), T(init_T) {}
+	process(int init_P, int init_T) : P(init_P), T(init_T) {}
 	process() {}
 
 	int P{};
@@ -51,66 +61,184 @@ struct process {
 template <typename T>
 class dynamicArray {
 public:
+	// по умолчанию
 	dynamicArray() {}
 
-	dynamicArray(int size) : _size(size), _capacity(size) {}
+	// размера size
+	dynamicArray(size_t size) {
+		size_ = size;
+		capacity_ = size;
+		array = new T[size];
+	}
+
+	// копирования
+	dynamicArray(const dynamicArray& other) : capacity_(other.capacity_), size_(other.size_), array(new T[other.capacity_]) {
+		for (size_t i = 0; i < size_; ++i) {
+			array[i] = other.array[i];
+		}
+	}
+
+	// корирование =
+	dynamicArray& operator= (const dynamicArray& other) {
+		if (this != &other) {
+			delete[] array;
+			this->size_ = other.size_;
+			this->capacity_ = other.capacity_;
+			array = new T[this->capacity_];
+			for (size_t i = 0; i < this->size_; ++i) {
+				this->array[i] = other.array[i];
+			}
+		}
+		return *this;
+	}
+
+	// перемещения
+	dynamicArray(dynamicArray&& other) : size_(other.size_), capacity_(other.capacity_), array(other.array) {
+		other.array = nullptr;
+		other.size_ = other.capacity_ = 0;
+	}
+
+	// перемещения =
+	dynamicArray& operator= (dynamicArray&& other) {
+		if (this != &other) {
+			delete[] array;
+			array = other.array;
+			size_ = other.size_;
+			capacity_ = other.capacity_;
+			other.array = nullptr;
+			other.size_ = other.capacity_ = 0;
+		}
+		return *this;
+	}
 
 	void push_back(const T& val) {
-		if (_size == _capacity) {
+		if (size_ == capacity_) {
 			grow();
 		}
-		array[_size++] = val;
+		array[size_++] = val;
 	}
 
-	T pop_back() {
-		if (_size == 0) {
-			throw std::out_of_range("out of dynamicArray range");
-			return T();
+	T& back() const {
+		if (size_ <= 0) {
+			std::abort();
 		}
-		return array[--_size];
+		return array[size_ - 1];
 	}
 
-	// не знаю, можно ли пользоваться std::move
-	void swap(T& left_val, T& right_val) {
-		T temp = left_val;
-		left_val = right_val;
-		right_val = temp;
+	void pop_back() {
+		if (size_ == 0) {
+			throw std::out_of_range("pop back on empty array");
+		}
+		--size_;
 	}
 
-	// оператор индексирования
-	T& operator[] (const int& index) const {
-		if (index >= _size || index < 0) {
-			throw std::out_of_range("out of range");
+	const T& operator[] (const size_t index) const {
+		if (index >= size_ || index < 0) {
+			throw std::out_of_range("Index out of range");
 		}
 		return array[index];
 	}
 
-	int size() const {
-		return _size;
+	T& operator[] (const size_t index) {
+		if (index >= size_ || index < 0) {
+			throw std::out_of_range("Index out of range");
+		}
+		return array[index];
+	}
+
+	size_t size() const {
+		return size_;
+	}
+
+	bool empty() const {
+		return size_ == 0;
+	}
+
+	size_t capacity() const {
+		return capacity_;
+	}
+
+	void reserve(size_t newCapacity) {
+
+		grow(newCapacity);
+	}
+
+	void clear() {
+		size_ = 0;
+	}
+
+	void resize(size_t newSize) {
+		if (newSize > capacity_) {
+			grow(newSize);
+		}
+		size_ = newSize;
+	}
+
+	void shrink_to_fit() {
+		if (size_ < capacity_) {
+			grow(size_);
+		}
+	}
+
+	T* begin() {
+		return array;
+	}
+
+	T* end() {
+		return array + size_;
+	}
+
+	const T* begin() const {
+		return array;
+	}
+
+	const T* end() const {
+		return array + size_;
+	}
+
+	const T* cbegin() const {
+		return array;
+	}
+
+	const T* cend() const {
+		return array + size_;
 	}
 
 	~dynamicArray() {
 		delete[] array;
+		array = nullptr;
 	}
 
 private:
-	// расширение массива при привышении capacity
-	void grow() {
-		_capacity = (_size * 2 > initialSize) ? (_size * 2) : (initialSize);
-		T* newArray = new T[_capacity];
 
-		for (int i = 0; i < _size; ++i) {
+	void grow(size_t newCapacity = 0) {
+		if (newCapacity < 0) {
+			throw std::invalid_argument("Negative capacity");
+		}
+
+		size_t targetCapacity = newCapacity ? newCapacity : (size_ * 2 > initialSize ? size_ * 2 : initialSize);
+
+		if (targetCapacity <= capacity_) {
+			return;
+		}
+
+		assert(size_ <= targetCapacity && "Size should not exceed target capacity");
+
+		T* newArray = new T[targetCapacity];
+
+		for (size_t i = 0; i < size_; ++i) {
 			newArray[i] = array[i];
 		}
 
 		delete[] array;
 		array = newArray;
+		capacity_ = targetCapacity;
 	}
 
-	T* array{};
-	int _capacity{};
-	int _size{};
-	const int initialSize = 2;
+	T* array = nullptr;
+	size_t capacity_{};
+	size_t size_{};
+	static constexpr size_t initialSize = 2;
 };
 
 // шаблонный класс кучи
@@ -118,18 +246,24 @@ template <typename T, typename Comparator>
 class myHeap {
 public:
 
+	myHeap() {}
+
+	myHeap(size_t reserveCapacity) {
+		array.reserve(reserveCapacity);
+	}
+
 	// посмотреть верхний элемент
 	T top() const {
 		if (array.size() != 0) {
 			return array[0];
 		}
+		throw std::out_of_range("empty heap");
 	}
 
 	// посмотреть верхний элемент и извлечением
 	T extract_top() {
 		if (array.size() == 0) {
 			throw std::out_of_range("out of heap range");
-			return T();
 		}
 
 		T res = array[0];
@@ -139,7 +273,8 @@ public:
 			return res;
 		}
 
-		array[0] = array.pop_back();
+		array[0] = array.back();
+		array.pop_back();
 		sift_down();
 
 		return res;
@@ -149,15 +284,19 @@ public:
 	void insert(T val) {
 		array.push_back(val);
 
-		if (array.size() == 1) {
+		if (array.size() <= 1) {
 			return;
 		}
 
 		sift_up(array.size() - 1);
 	}
 
-	int size() const {
+	size_t size() const {
 		return array.size();
+	}
+
+	bool empty() const {
+		return array.size() == 0;
 	}
 
 private:
@@ -168,7 +307,7 @@ private:
 		}
 
 		while (index != 0 && cmp(array[index], array[parent(index)])) {
-			array.swap(array[index], array[parent(index)]);
+			swap(array[index], array[parent(index)]);
 			index = parent(index);
 		}
 	}
@@ -178,7 +317,6 @@ private:
 		int left{};
 		int right{};
 
-		// реализовать====================================================================================================
 		while (left != -1) {
 			int left = left_child(index);
 			int right = right_child(index);
@@ -196,13 +334,13 @@ private:
 			if (cmp(array[index], array[j])) {
 				break;
 			}
-			array.swap(array[index], array[j]);
+			swap(array[index], array[j]);
 			index = j;
 		}
 	}
 
 	// индекс родятеля
-	int parent(const int& index) {
+	int parent(int index) {
 		if (index == 0) {
 			return -1;
 		}
@@ -210,7 +348,7 @@ private:
 	}
 
 	// индекс левого потомка
-	int left_child(const int& index) {
+	int left_child(int index) {
 		if ((2 * index + 1) >= array.size()) {
 			return -1;
 		}
@@ -218,7 +356,7 @@ private:
 	}
 
 	// индекс правого потомка
-	int right_child(const int& index) {
+	int right_child(int index) {
 		if ((2 * index + 2) >= array.size()) {
 			return -1;
 		}
@@ -244,13 +382,13 @@ public:
 
 int main() {
 
-	myHeap<process, comparator<process>> heap;
-
 	int n{};
 
 	std::cin >> n;
 
-	// создание кучи
+	myHeap<process, comparator<process>> heap(n);
+
+	// заполняем кучу
 	for (int i = 0; i < n; ++i) {
 		int P{}, T{};
 		std::cin >> P >> T;
@@ -260,7 +398,7 @@ int main() {
 	int count{};
 
 	// повторять, пока куча не будет пустой
-	while (heap.size() != 0) {
+	while (!heap.empty()) {
 
 		// процесс выполнился - удалять его
 		if (heap.top().t >= heap.top().T) {
@@ -268,11 +406,11 @@ int main() {
 			continue;
 		}
 
-		// все процессы выполнились (куча пустая)
-		if (heap.size() == 0) {
+		// все процессы выполнились (куча пустая) - можно выходить
+		if (heap.empty()) {
 			break;
 		}
-		
+
 		// извлечение процесса
 		process top = heap.extract_top();
 
