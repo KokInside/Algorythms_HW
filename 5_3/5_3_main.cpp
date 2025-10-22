@@ -49,7 +49,7 @@ public:
 		}
 	}
 
-	// корирование =
+	// корирования =
 	dynamicArray& operator= (const dynamicArray& other) {
 		if (this != &other) {
 			delete[] array;
@@ -90,7 +90,7 @@ public:
 	}
 
 	T& back() const {
-		if (size_ <= 0) {
+		if (size_ == 0) {
 			std::abort();
 		}
 		return array[size_ - 1];
@@ -104,14 +104,14 @@ public:
 	}
 
 	const T& operator[] (const size_t index) const {
-		if (index >= size_ || index < 0) {
+		if (index >= size_) {
 			throw std::out_of_range("Index out of range");
 		}
 		return array[index];
 	}
 
 	T& operator[] (const size_t index) {
-		if (index >= size_ || index < 0) {
+		if (index >= size_) {
 			throw std::out_of_range("Index out of range");
 		}
 		return array[index];
@@ -175,6 +175,14 @@ public:
 		return array + size_;
 	}
 
+	T* data() {
+		return array;
+	}
+
+	const T* data() const {
+		return array;
+	}
+
 	~dynamicArray() {
 		delete[] array;
 		array = nullptr;
@@ -183,9 +191,6 @@ public:
 private:
 
 	void grow(size_t newCapacity = 0) {
-		if (newCapacity < 0) {
-			throw std::invalid_argument("Negative capacity");
-		}
 
 		size_t targetCapacity = newCapacity ? newCapacity : (size_ * 2 > initialSize ? size_ * 2 : initialSize);
 
@@ -221,52 +226,46 @@ struct interval {
 	int thicknessDelta{};
 };
 
-// шаблонная функция сортировки слиянием
+// шаблонная функция сортировки слиянием на итераторах
 template <typename T, typename Comparator>
-void mergeSort(dynamicArray<T>& array, int start, int end, Comparator cmp) {
+void mergeSort(T* start, T* end, Comparator cmp) {
 	if (end - start <= 1) {
 		return;
 	}
 
-	int mid = (start + end) / 2;
+	T* mid = start + (end - start) / 2;
 
-	mergeSort(array, start, mid, cmp);
-	mergeSort(array, mid, end, cmp);
+	mergeSort(start, mid, cmp);
+	mergeSort(mid, end, cmp);
 
 	dynamicArray<T> buffer;
 	buffer.reserve(end - start);
 
-	int lidx = start, ridx = mid;
+	T* lidx = start;
+	T* ridx = mid;
 
 	while (lidx < mid && ridx < end) {
-		if (cmp(array[lidx], array[ridx])) {
-			buffer.push_back(array[lidx++]);
+		if (cmp(*lidx, *ridx)) {
+			buffer.push_back(*lidx);
+			++lidx;
 		}
 		else {
-			buffer.push_back(array[ridx++]);
-		}
-	}
-
-	if (lidx != mid) {
-		for (lidx; lidx < mid; ++lidx) {
-			buffer.push_back(array[lidx]);
-		}
-	}
-	else if (ridx != end) {
-		for (ridx; ridx < end; ++ridx) {
-			buffer.push_back(array[ridx]);
+			buffer.push_back(*ridx);
+			++ridx;
 		}
 	}
 
 	while (lidx < mid) {
-		buffer.push_back(array[lidx++]);
+		buffer.push_back(*lidx);
+		++lidx;
 	}
 	while (ridx < end) {
-		buffer.push_back(array[ridx++]);
+		buffer.push_back(*ridx);
+		++ridx;
 	}
 
-	for (int i = start, j = 0; i < end; ++i, ++j) {
-		array[i] = buffer[j];
+	for (T *ptr = start, *buffer_ptr = buffer.data(); ptr < end; ++ptr, ++buffer_ptr) {
+		*ptr = *buffer_ptr;
 	}
 }
 
@@ -283,13 +282,14 @@ public:
 
 int main() {
 
-	dynamicArray<interval> arr;
 	
 	int n{};
 	int startPoint{}, endPoint{};
 	
 	std::cin >> n;
 	
+	dynamicArray<interval> arr;
+
 	arr.reserve(n * 2);
 	
 	// заполняем массив
@@ -299,13 +299,8 @@ int main() {
 		arr.push_back(interval(endPoint, -1));
 	}
 	
-	// пересобрать на итераторы
-	mergeSort(arr, 0, arr.size(), [](interval a, interval b) { return a.point < b.point; });
-	
-	if (arr.empty()) {
-		std::cout << 0;
-		return 0;
-	}
+	// Сортировака слиянием
+	mergeSort(arr.begin(), arr.end(), [](interval a, interval b) { return a.point < b.point; });
 	
 	int prev = arr[0].point;
 	
