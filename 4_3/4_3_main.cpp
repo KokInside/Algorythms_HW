@@ -253,7 +253,7 @@ public:
 	}
 
 	// посмотреть верхний элемент
-	const T& top() {
+	const T& top() const {
 		if (array.size() != 0) {
 			return array[0];
 		}
