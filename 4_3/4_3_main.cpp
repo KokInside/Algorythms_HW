@@ -253,7 +253,7 @@ public:
 	}
 
 	// посмотреть верхний элемент
-	T top() const {
+	const T& top() {
 		if (array.size() != 0) {
 			return array[0];
 		}
@@ -318,8 +318,8 @@ private:
 		int right{};
 
 		while (left != -1) {
-			int left = left_child(index);
-			int right = right_child(index);
+			left = left_child(index);
+			right = right_child(index);
 
 			if (left == -1) {
 				break;
@@ -367,13 +367,12 @@ private:
 	Comparator cmp;
 };
 
-// шаблонный класс компаратора
-template <typename T>
+// класс компаратора
 class comparator {
 public:
 	comparator() {}
 
-	bool operator() (const T& pr1, const T& pr2) const {
+	bool operator() (const process& pr1, const process& pr2) const {
 		return ((pr1.P * (pr1.t + 1)) < (pr2.P * (pr2.t + 1)));
 	}
 
@@ -386,7 +385,7 @@ int main() {
 
 	std::cin >> n;
 
-	myHeap<process, comparator<process>> heap(n);
+	myHeap<process, comparator> heap(n);
 
 	// заполняем кучу
 	for (int i = 0; i < n; ++i) {
