@@ -214,6 +214,7 @@ static int getKey(const std::string& str, int pos) {
 	return static_cast<unsigned int>(str[pos]);
 }
 
+// функция порязрядной сортировки
 static void msd(const dynamicArray<std::string>& arr, int begin, int end, dynamicArray<int>& idx, int pos) {
 
 	// одна строка для данного разряда - сортировать не нужно
