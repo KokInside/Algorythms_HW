@@ -205,20 +205,23 @@ private:
 	static constexpr size_t initialSize = 2;
 };
 
+// возвращает индекс строки по индексу pos. Предотвращает выход за пределы строки
 static int getKey(const std::string& str, int pos) {
-	if (pos >= static_cast<int>(str.size())) {
+	if (pos >= static_cast<unsigned int>(str.size())) {
 		return 0;
 	}
 
-	return static_cast<int>(str[pos]);
+	return static_cast<unsigned int>(str[pos]);
 }
 
-void msd(const dynamicArray<std::string>& arr, int begin, int end, dynamicArray<int>& idx, int pos) {
+static void msd(const dynamicArray<std::string>& arr, int begin, int end, dynamicArray<int>& idx, int pos) {
 
+	// одна строка для данного разряда - сортировать не нужно
 	if (end - begin <= 1) {
 		return;
 	}
 
+	// нахождение минимального и максимального значения для данного разряда
 	int min = getKey(arr[idx[begin]], pos), max = getKey(arr[idx[begin]], pos);
 
 	for (int i = begin; i < end; ++i) {
@@ -231,16 +234,20 @@ void msd(const dynamicArray<std::string>& arr, int begin, int end, dynamicArray<
 		}
 	}
 
+	// если разряд пустой (все символы в нём == '\0') - return
 	if (max == 0 && min == 0) {
 		return;
 	}
 
+	// count - массив с размером задействованного алфавита + 1, чтобы добавить одно значение в конце
 	dynamicArray<int> count(max - min + 2);
 
+	// здесь count будет содержать количество строк с символом в данном разряде
 	for (int i = begin; i < end; ++i) {
 		++count[getKey(arr[idx[i]], pos) - min];
 	}
 
+	// здесь count будет содержать индексы последней позиции строк с символом текущего разряда
 	for (int i = 1; i < max - min + 1; ++i) {
 		count[i] += count[i - 1];
 	}
@@ -249,25 +256,34 @@ void msd(const dynamicArray<std::string>& arr, int begin, int end, dynamicArray<
 
 	// внутри idx работаем только в диапазоне [begin; end), вылезать за него нельзя
 
+	// tmp - временный массив, в который будет вставляться отсортированные строки
 	dynamicArray<int> tmp(end - begin);
 
+	// идём с конца массива arr, вставляем в tmp строки из arr, порядок получается отсортированным в пределах разряда
 	for (int i = end - 1; i >= begin; --i) {
 		tmp[--count[getKey(arr[idx[i]], pos) - min]] = idx[i];
 	}
 
+	// помещает отсортированные значения из временного массива tmp в массив idx
 	for (int i = begin; i < end; ++i) {
 		idx[i] = tmp[i - begin];
 	}
 
+	// для удобства в последний элемент count помещаю размер сортируемого массива. Чтобы последний участок сортировки в пределах одного разряда
+	// было удобно передавать дальше на сортировку
 	count[max - min + 1] = end - begin;
 
+	// Запускаем рекурсию сортировки внутри разряда с одинаковыми символами
 	for (int i = 0; i < max - min + 1; ++i) {
+		// условие не пуского разряда
 		if (count[i] == count[i + 1]) {
 			continue;
 		}
 		msd(arr, count[i] + begin, count[i + 1] + begin, idx, pos + 1);
 	}
 }
+
+// Глубина рекурсии ограничена максимальным размером передаваемой строки
 
 int main() {
 
@@ -281,6 +297,9 @@ int main() {
 		arr.push_back(std::move(str));
 	}
 
+	// Чтобы не передвигать строки в массиве arr при сортировке, лучше хранить индексы в массиве idx, ссылающиеся на индекс строки в arr.
+	// Значение в idx - индекс строки в arr
+	// Значения строк в idx хранятся в отсортированном порядке
 	dynamicArray<int> idx(n);
 
 	for (int i = 0; i < n; ++i) {
