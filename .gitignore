@@ -6,6 +6,9 @@
 *.sln.docstates
 *.VC.db
 *.opendb
+*.filters
+*.vcxproj
+*.sln
 
 # Build outputs
 [Bb]in/
