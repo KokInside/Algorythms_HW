@@ -1,26 +1,26 @@
-#include <iostream>
+п»ї#include <iostream>
 #include <stdexcept>
 #include <assert.h>
 
 /*
-5.3. Закраска прямой
+5.3. Р—Р°РєСЂР°СЃРєР° РїСЂСЏРјРѕР№
 
-На числовой прямой окрасили N отрезков.
-Известны координаты левого и правого концов каждого отрезка [L_i, R_i].
-Найти длину окрашенной части числовой прямой.
+РќР° С‡РёСЃР»РѕРІРѕР№ РїСЂСЏРјРѕР№ РѕРєСЂР°СЃРёР»Рё N РѕС‚СЂРµР·РєРѕРІ.
+РР·РІРµСЃС‚РЅС‹ РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ Рё РїСЂР°РІРѕРіРѕ РєРѕРЅС†РѕРІ РєР°Р¶РґРѕРіРѕ РѕС‚СЂРµР·РєР° [L_i, R_i].
+РќР°Р№С‚Рё РґР»РёРЅСѓ РѕРєСЂР°С€РµРЅРЅРѕР№ С‡Р°СЃС‚Рё С‡РёСЃР»РѕРІРѕР№ РїСЂСЏРјРѕР№.
 
-N <= 10000. L_i, R_i — целые числа в диапазоне [0, 10^9].
+N <= 10000. L_i, R_i вЂ” С†РµР»С‹Рµ С‡РёСЃР»Р° РІ РґРёР°РїР°Р·РѕРЅРµ [0, 10^9].
 
-Формат ввода
-В первой строке записано количество отрезков.
-В каждой последующей строке через пробел записаны координаты левого и правого концов отрезка.
+Р¤РѕСЂРјР°С‚ РІРІРѕРґР°
+Р’ РїРµСЂРІРѕР№ СЃС‚СЂРѕРєРµ Р·Р°РїРёСЃР°РЅРѕ РєРѕР»РёС‡РµСЃС‚РІРѕ РѕС‚СЂРµР·РєРѕРІ.
+Р’ РєР°Р¶РґРѕР№ РїРѕСЃР»РµРґСѓСЋС‰РµР№ СЃС‚СЂРѕРєРµ С‡РµСЂРµР· РїСЂРѕР±РµР» Р·Р°РїРёСЃР°РЅС‹ РєРѕРѕСЂРґРёРЅР°С‚С‹ Р»РµРІРѕРіРѕ Рё РїСЂР°РІРѕРіРѕ РєРѕРЅС†РѕРІ РѕС‚СЂРµР·РєР°.
 
-Формат вывода
-Выведите целое число — длину окрашенной части.
+Р¤РѕСЂРјР°С‚ РІС‹РІРѕРґР°
+Р’С‹РІРµРґРёС‚Рµ С†РµР»РѕРµ С‡РёСЃР»Рѕ вЂ” РґР»РёРЅСѓ РѕРєСЂР°С€РµРЅРЅРѕР№ С‡Р°СЃС‚Рё.
 
 */
 
-// шаблонный swap
+// С€Р°Р±Р»РѕРЅРЅС‹Р№ swap
 template<typename T>
 void swap(T& pr1, T& pr2) {
 	T tmp = pr1;
@@ -28,28 +28,28 @@ void swap(T& pr1, T& pr2) {
 	pr2 = tmp;
 }
 
-// шаблонный класс саморасширяющегося динамического массива
+// С€Р°Р±Р»РѕРЅРЅС‹Р№ РєР»Р°СЃСЃ СЃР°РјРѕСЂР°СЃС€РёСЂСЏСЋС‰РµРіРѕСЃСЏ РґРёРЅР°РјРёС‡РµСЃРєРѕРіРѕ РјР°СЃСЃРёРІР°
 template <typename T>
 class dynamicArray {
 public:
-	// по умолчанию
+	// РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ
 	dynamicArray() {}
 
-	// размера size
+	// СЂР°Р·РјРµСЂР° size
 	dynamicArray(size_t size) {
 		size_ = size;
 		capacity_ = size;
 		array = new T[size];
 	}
 
-	// копирования
+	// РєРѕРїРёСЂРѕРІР°РЅРёСЏ
 	dynamicArray(const dynamicArray& other) : capacity_(other.capacity_), size_(other.size_), array(new T[other.capacity_]) {
 		for (size_t i = 0; i < size_; ++i) {
 			array[i] = other.array[i];
 		}
 	}
 
-	// корирования =
+	// РєРѕСЂРёСЂРѕРІР°РЅРёСЏ =
 	dynamicArray& operator= (const dynamicArray& other) {
 		if (this != &other) {
 			delete[] array;
@@ -63,13 +63,13 @@ public:
 		return *this;
 	}
 
-	// перемещения
+	// РїРµСЂРµРјРµС‰РµРЅРёСЏ
 	dynamicArray(dynamicArray&& other) : size_(other.size_), capacity_(other.capacity_), array(other.array) {
 		other.array = nullptr;
 		other.size_ = other.capacity_ = 0;
 	}
 
-	// перемещения =
+	// РїРµСЂРµРјРµС‰РµРЅРёСЏ =
 	dynamicArray& operator= (dynamicArray&& other) {
 		if (this != &other) {
 			delete[] array;
@@ -217,7 +217,7 @@ private:
 	static constexpr size_t initialSize = 2;
 };
 
-// структура интервала
+// СЃС‚СЂСѓРєС‚СѓСЂР° РёРЅС‚РµСЂРІР°Р»Р°
 struct interval {
 	interval() {}
 	interval(int init_point, int init_thicknessDelta) : point(init_point), thicknessDelta(init_thicknessDelta) {}
@@ -226,7 +226,7 @@ struct interval {
 	int thicknessDelta{};
 };
 
-// шаблонная функция сортировки слиянием на итераторах
+// С€Р°Р±Р»РѕРЅРЅР°СЏ С„СѓРЅРєС†РёСЏ СЃРѕСЂС‚РёСЂРѕРІРєРё СЃР»РёСЏРЅРёРµРј РЅР° РёС‚РµСЂР°С‚РѕСЂР°С…
 template <typename T, typename Comparator>
 void mergeSort(T* start, T* end, Comparator cmp) {
 	if (end - start <= 1) {
@@ -269,7 +269,7 @@ void mergeSort(T* start, T* end, Comparator cmp) {
 	}
 }
 
-// шаблонный класс компаратора
+// С€Р°Р±Р»РѕРЅРЅС‹Р№ РєР»Р°СЃСЃ РєРѕРјРїР°СЂР°С‚РѕСЂР°
 template <typename T>
 class comparator {
 public:
@@ -292,14 +292,14 @@ int main() {
 
 	arr.reserve(n * 2);
 	
-	// заполняем массив
+	// Р·Р°РїРѕР»РЅСЏРµРј РјР°СЃСЃРёРІ
 	for (int i = 0; i < n; ++i) {
 		std::cin >> startPoint >> endPoint;
 		arr.push_back(interval(startPoint, 1));
 		arr.push_back(interval(endPoint, -1));
 	}
 	
-	// Сортировака слиянием
+	// РЎРѕСЂС‚РёСЂРѕРІР°РєР° СЃР»РёСЏРЅРёРµРј
 	mergeSort(arr.begin(), arr.end(), [](interval a, interval b) { return a.point < b.point; });
 	
 	int prev = arr[0].point;
