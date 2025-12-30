@@ -327,13 +327,14 @@ private:
 
 			int j = left;
 
-			if (right != -1 && cmp(array[right], array[index])) {
+			if (right != -1 && cmp(array[right], array[left])) {
 				j = right;
 			}
 
 			if (cmp(array[index], array[j])) {
 				break;
 			}
+
 			swap(array[index], array[j]);
 			index = j;
 		}
