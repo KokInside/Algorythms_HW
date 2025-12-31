@@ -6,9 +6,11 @@
 #include <utility>
 #include <algorithm>
 #include <string>
+#include <stdexcept>
 
 const static std::array<uint8_t, 16> finish = { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 0 };
 
+// класс состояния
 class State {
 public:
 
@@ -39,6 +41,7 @@ public:
 		return (A + B) % 2 == 0;
 	}
 
+	// эвристика по минимальному количеству перемещений костяшки на нужное место (как на семинаре)
 	int getHeuristic() const {
 
 		int heuristic{};
@@ -67,45 +70,6 @@ public:
 	}
 
 
-	State MoveRight() const {
-
-		State newState(*this);
-
-		std::swap(newState.array[emptyPos], newState.array[emptyPos - 1]);
-
-		--newState.emptyPos;
-		return newState;
-
-	}
-
-	State MoveLeft() const {
-		State newState(*this);
-
-		std::swap(newState.array[emptyPos], newState.array[emptyPos + 1]);
-
-		++newState.emptyPos;
-		return newState;
-	}
-
-	State MoveUp() const {
-		State newState(*this);
-
-		std::swap(newState.array[emptyPos], newState.array[emptyPos + 4]);
-
-		newState.emptyPos += 4;
-		return newState;
-	}
-
-	State MoveDown() const {
-		State newState(*this);
-
-		std::swap(newState.array[emptyPos], newState.array[emptyPos - 4]);
-
-		newState.emptyPos -= 4;
-		return newState;
-	}
-
-
 	bool canMoveRight() const {
 		return emptyPos % 4 != 0;
 	}
@@ -122,6 +86,65 @@ public:
 		return emptyPos > 3;
 	}
 
+
+	State MoveRight() const {
+
+		if (!canMoveRight()) {
+			throw std::logic_error("Can't move right");
+		}
+
+		State newState(*this);
+
+		std::swap(newState.array[emptyPos], newState.array[emptyPos - 1]);
+
+		--newState.emptyPos;
+		return newState;
+
+	}
+
+	State MoveLeft() const {
+
+		if (!canMoveLeft()) {
+			throw std::logic_error("Can't move left");
+		}
+
+		State newState(*this);
+
+		std::swap(newState.array[emptyPos], newState.array[emptyPos + 1]);
+
+		++newState.emptyPos;
+		return newState;
+	}
+
+	State MoveUp() const {
+
+		if (!canMoveUp()) {
+			throw std::logic_error("Can't move up");
+		}
+
+		State newState(*this);
+
+		std::swap(newState.array[emptyPos], newState.array[emptyPos + 4]);
+
+		newState.emptyPos += 4;
+		return newState;
+	}
+
+	State MoveDown() const {
+
+		if (!canMoveDown()) {
+			throw std::logic_error("Can't move down");
+		}
+
+		State newState(*this);
+
+		std::swap(newState.array[emptyPos], newState.array[emptyPos - 4]);
+
+		newState.emptyPos -= 4;
+		return newState;
+	}
+
+
 	static const int size = 16;
 
 	friend class Hasher;
@@ -130,6 +153,7 @@ public:
 
 private:
 
+	// количество инверсий костяшек
 	int getInvCount() const {
 		int invCount{};
 
@@ -149,6 +173,7 @@ private:
 	int emptyPos = -1;
 };
 
+// хэширование состояния
 class Hasher {
 public:
 
@@ -165,14 +190,17 @@ public:
 	}
 };
 
+// сравнивание состояний по эвристикам
 class CMP {
 public:
+
 	bool operator() (const State& a, const State& b) {
 		return a.getHeuristic() > b.getHeuristic();
 	}
 };
 
 std::string GetSolution(const std::array<uint8_t, 16>& arr) {
+	
 	State start(arr);
 
 	if (!start.isSolvable()) {
@@ -183,8 +211,7 @@ std::string GetSolution(const std::array<uint8_t, 16>& arr) {
 
 	visited[start] = 'S';
 
-	//std::queue<State> q;
-
+	// приоритет по наименьшей эвристике
 	std::priority_queue<State, std::vector<State>, CMP> q;
 
 	q.push(start);
@@ -198,12 +225,19 @@ std::string GetSolution(const std::array<uint8_t, 16>& arr) {
 			break;
 		}
 
+		// просто большое начальное значение эвристик
 		int heuristic = 1000;
 		int heuristic_2 = 1000;
 
+		// будем рассматривать только 2 состояния с наименьшими эвристиками
 		std::pair<State, char> first;
 		std::pair<State, char> second;
 
+
+		// 4 аналогичных раза пытаемся сдвигуть по 4-м направлениям. Запоминаем 2 наименьшие эвристики. 
+		// 
+		// в first будет точно наименьшая, потому что она будет всегда перезаписывать, если там лежит что-то больше
+		// в second если повезёт что-то будет находиться, но только если хоть одна следующая эвристика будет больше любой предыдущей
 		
 		if (state.canMoveDown()) {
 			State newState = state.MoveDown();
@@ -273,6 +307,7 @@ std::string GetSolution(const std::array<uint8_t, 16>& arr) {
 			}
 		}
 
+		// пушим только 2 состояния с наименьшими эвристиками
 		if (first.first.emptyPos != -1) {
 			visited[first.first] = first.second;
 			q.push(first.first);

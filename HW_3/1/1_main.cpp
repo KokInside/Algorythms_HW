@@ -8,6 +8,7 @@ int main() {
 
 	ListGraph startGraph(13);
 
+	// Инициализация вершин
 	startGraph.AddEdge(0, 6);
 	startGraph.AddEdge(2, 1);
 	startGraph.AddEdge(3, 6);
@@ -26,10 +27,14 @@ int main() {
 	startGraph.AddEdge(11, 12);
 	startGraph.AddEdge(12, 6);
 
+	// каждый граф копирует предыдущий
 	MatrixGraph matrixGraph(startGraph);
 	SetGraph setGraph(matrixGraph);
 	ArcGraph arcGraph(setGraph);
 	ListGraph listGraph(arcGraph);
+
+
+	// BFS
 
 	std::cout << "BFS:" << std::endl << std::endl;
 
@@ -53,6 +58,9 @@ int main() {
 	std::cout << std::endl;
 	std::cout << std::endl;
 
+
+	// DFS
+
 	std::cout << "DFS:" << std::endl << std::endl;
 
 	std::cout << "List Graph" << std::endl;
@@ -74,6 +82,9 @@ int main() {
 	std::cout << std::endl;
 	std::cout << std::endl;
 	std::cout << std::endl;
+
+
+	// Topological Sort
 
 	std::cout << "Topological Sort:" << std::endl << std::endl;
 

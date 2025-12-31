@@ -3,7 +3,6 @@
 #include <functional>
 #include <queue>
 #include <cstdint>
-#include <exception>
 
 class IGraph {
 public:

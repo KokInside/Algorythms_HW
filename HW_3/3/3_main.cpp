@@ -106,7 +106,7 @@ ListGraph::~ListGraph() {
 /////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Дейкстра
 
-size_t Dijkstra(const IGraph& graph, int from, int to) {
+size_t ShortestPath(const IGraph& graph, int from, int to) {
 
 	if (from < 0 || to < 0 || from >= graph.VerticesCount() || to >= graph.VerticesCount()) {
 		throw std::out_of_range("Out of vertices range");
@@ -118,13 +118,12 @@ size_t Dijkstra(const IGraph& graph, int from, int to) {
 
 	std::set<std::pair<size_t, size_t>> s;
 
-	s.insert(std::pair<size_t, size_t>(0, from));
+	s.emplace(0, from);
 
 	while (!s.empty()) {
-		size_t min_path = (*(s.begin())).first;
 		size_t vertex = (*(s.begin())).second;
 
-		s.erase(std::pair<size_t, size_t>(min_path, vertex));
+		s.erase(s.begin());
 
 		std::vector<std::pair<int, int>> nextVertices = graph.GetNextVertices(vertex);
 
@@ -133,10 +132,12 @@ size_t Dijkstra(const IGraph& graph, int from, int to) {
 			int path = nextVertices[i].second;
 			int ver = nextVertices[i].first;
 
-			if (minPath[vertex] != UINT64_MAX && minPath[ver] > minPath[vertex] + path) {
+			if (minPath[ver] == UINT64_MAX || minPath[ver] > minPath[vertex] + path) {
 				s.erase({ minPath[ver], ver });
+
 				minPath[ver] = minPath[vertex] + path;
-				s.insert({ minPath[ver], ver });
+
+				s.emplace(minPath[ver], ver);
 			}
 		}
 	}
@@ -164,7 +165,7 @@ int main() {
 	
 	std::cin >> s >> t;
 
-	std::cout << Dijkstra(graph, s, t);
+	std::cout << ShortestPath(graph, s, t);
 
 	return 0;
 }

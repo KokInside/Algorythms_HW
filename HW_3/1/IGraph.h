@@ -2,8 +2,6 @@
 #include <vector>
 #include <functional>
 #include <queue>
-#include <exception>
-#include <stack>
 
 class IGraph {
 public:

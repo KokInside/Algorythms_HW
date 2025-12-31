@@ -101,7 +101,7 @@ ListGraph::~ListGraph() {
 }
 
 // Spanning tree = Остовное дерево
-void MinSpanningTree(const IGraph& graph, std::vector<bool>& visited, std::vector<size_t>& parent, std::vector<size_t>& minEdge) {
+void MinSpanningTree(const IGraph& graph, std::vector<bool>& visited, std::vector<int>& parent, std::vector<size_t>& minEdge) {
 
 	// стартовая вершина 0
 
@@ -114,7 +114,6 @@ void MinSpanningTree(const IGraph& graph, std::vector<bool>& visited, std::vecto
 
 	while (!s.empty()) {
 		int cur_vertex = (*s.begin()).second;
-		int min_edge = (*s.begin()).first;
 
 		visited[cur_vertex] = true;
 
@@ -141,18 +140,18 @@ void MinSpanningTree(const IGraph& graph, std::vector<bool>& visited, std::vecto
 	}
 }
 
-int MinSpanningTreeWeight(const IGraph& graph) {
+int getMinSpanningTreeWeight(const IGraph& graph) {
 
 	std::vector<bool> visited(graph.VerticesCount(), false);
 
-	std::vector<size_t> parent(graph.VerticesCount(), -1);
+	std::vector<int> parent(graph.VerticesCount(), -1);
 
 	std::vector<size_t> minEdge(graph.VerticesCount(), UINT64_MAX);
 
 	// По условию граф связный
 	MinSpanningTree(graph, visited, parent, minEdge);
 
-	return std::accumulate(minEdge.begin(), minEdge.end(), 0);
+	return std::accumulate(minEdge.begin(), minEdge.end(), 0ll);
 }
 
 int main() {
@@ -169,11 +168,11 @@ int main() {
 
 		std::cin >> b >> e >> w;
 
-		// чтобы удобнее работать вершины запишу [0, n)
+		// чтобы удобнее работать, вершины запишу [0, n)
 		graph.AddEdge(b - 1, e - 1, w);
 	}
 
-	std::cout << MinSpanningTreeWeight(graph);
+	std::cout << getMinSpanningTreeWeight(graph);
 
 	return 0;
 }

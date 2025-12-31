@@ -28,6 +28,5 @@ int main() {
 		std::cout << str.size() << std::endl << str;
 	}
 
-
 	return 0;
 }
