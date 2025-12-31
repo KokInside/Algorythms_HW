@@ -1,5 +1,5 @@
 ﻿#include "ListGraph.h"
-#include <exception>
+#include <iostream>
 
 ListGraph::ListGraph(size_t size) : adjacencyList(size) {
 }
@@ -14,7 +14,7 @@ ListGraph::ListGraph(const IGraph& graph) : adjacencyList(graph.VerticesCount())
 void ListGraph::AddEdge(int from, int to) {
 
 	if (from < 0 || to < 0 || from >= VerticesCount() || to >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	adjacencyList[from].push_back(to);
@@ -28,7 +28,7 @@ int ListGraph::VerticesCount() const {
 std::vector<int> ListGraph::GetNextVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	return adjacencyList[vertex];
@@ -37,7 +37,7 @@ std::vector<int> ListGraph::GetNextVertices(int vertex) const {
 std::vector<int> ListGraph::GetPrevVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> prevVertices;

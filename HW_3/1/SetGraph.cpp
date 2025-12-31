@@ -1,4 +1,5 @@
 ﻿#include "SetGraph.h"
+#include <iostream>
 
 SetGraph::SetGraph(size_t size) : adjacencySet(size) {
 }
@@ -17,7 +18,7 @@ SetGraph::SetGraph(const IGraph& graph) : adjacencySet(graph.VerticesCount()) {
 void SetGraph::AddEdge(int from, int to) {
 
 	if (from < 0 || to < 0 || from >= VerticesCount() || to >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	adjacencySet[from].insert(to);
@@ -31,7 +32,7 @@ int SetGraph::VerticesCount() const {
 std::vector<int> SetGraph::GetNextVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> nextVertices;
@@ -47,7 +48,7 @@ std::vector<int> SetGraph::GetNextVertices(int vertex) const {
 std::vector<int> SetGraph::GetPrevVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> res;

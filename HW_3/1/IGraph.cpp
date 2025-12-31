@@ -1,9 +1,10 @@
 ﻿#include "IGraph.h"
+#include <iostream>
 
 void IGraph::BFS(int vertex, const std::function<void(int)> func) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<bool> visited(VerticesCount(), false);
@@ -23,7 +24,7 @@ void IGraph::BFS(int vertex, const std::function<void(int)> func) const {
 void IGraph::DFS(int vertex, const std::function<void(int)> func) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<bool> visited(VerticesCount(), false);

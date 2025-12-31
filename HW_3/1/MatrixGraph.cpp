@@ -1,4 +1,5 @@
 ﻿#include "MatrixGraph.h"
+#include <iostream>
 
 MatrixGraph::MatrixGraph(size_t size) : adjacencyMatrix(size, std::vector<int>(size, 0)) {
 }
@@ -17,7 +18,7 @@ MatrixGraph::MatrixGraph(const IGraph& graph) : adjacencyMatrix(graph.VerticesCo
 void MatrixGraph::AddEdge(int from, int to) {
 
 	if (from < 0 || to < 0 || from >= VerticesCount() || to >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	++adjacencyMatrix[from][to];
@@ -31,7 +32,7 @@ int MatrixGraph::VerticesCount() const {
 std::vector<int> MatrixGraph::GetNextVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> nextVertices;
@@ -49,7 +50,7 @@ std::vector<int> MatrixGraph::GetNextVertices(int vertex) const {
 std::vector<int> MatrixGraph::GetPrevVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> prevVertices;

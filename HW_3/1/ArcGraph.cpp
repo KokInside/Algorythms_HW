@@ -1,4 +1,5 @@
 ﻿#include "ArcGraph.h"
+#include <iostream>
 
 ArcGraph::ArcGraph(size_t size) : vertexCount(size) {
 }
@@ -17,7 +18,7 @@ ArcGraph::ArcGraph(const IGraph& graph) : vertexCount(graph.VerticesCount()) {
 void ArcGraph::AddEdge(int from, int to) {
 
 	if (from < 0 || to < 0 || from >= VerticesCount() || to >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	adjacencyArc.push_back(std::move(std::pair<int, int>(from, to)));
@@ -25,13 +26,13 @@ void ArcGraph::AddEdge(int from, int to) {
 
 int ArcGraph::VerticesCount() const {
 
-	return vertexCount;
+	return static_cast<int>(vertexCount);
 }
 
 std::vector<int> ArcGraph::GetNextVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> nextVertices;
@@ -49,7 +50,7 @@ std::vector<int> ArcGraph::GetNextVertices(int vertex) const {
 std::vector<int> ArcGraph::GetPrevVertices(int vertex) const {
 
 	if (vertex < 0 || vertex >= VerticesCount()) {
-		throw std::exception("Out of vertices range");
+		throw std::out_of_range("Out of vertices range");
 	}
 
 	std::vector<int> res;
