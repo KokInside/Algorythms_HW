@@ -10,6 +10,7 @@
 #include <algorithm>
 
 /*
+3. Города
 
 Требуется отыскать самый короткий маршрут между городами.
 Из города может выходить дорога, которая возвращается в этот же город.
@@ -36,9 +37,7 @@ public:
 
 };
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Реализация Графа
-
 class ListGraph : public IGraph {
 public:
 
@@ -116,9 +115,7 @@ std::vector<std::pair<int, int>> ListGraph::GetNextVertices(int vertex) const {
 ListGraph::~ListGraph() {
 }
 
-/////////////////////////////////////////////////////////////////////////////////////////////////////////
 // Дейкстра
-
 size_t ShortestPath(const IGraph& graph, int from, int to) {
 
 	if (from < 0 || to < 0 || from >= graph.VerticesCount() || to >= graph.VerticesCount()) {

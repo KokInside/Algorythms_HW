@@ -5,7 +5,7 @@
 #include "ArcGraph.h"
 
 /*
-* 
+
 Необходимо написать несколько реализаций интерфейса:
 - ListGraph, хранящий граф в виде массива списков смежности,
 - MatrixGraph, хранящий граф в виде матрицы смежности,
@@ -108,18 +108,21 @@ int main() {
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
+
 	std::cout << "Matrix Graph" << std::endl;
 	for (auto& i : matrixGraph.TopologicalSort()) {
 		std::cout << i << " ";
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
+
 	std::cout << "Set Graph" << std::endl;
 	for (auto& i : setGraph.TopologicalSort()) {
 		std::cout << i << " ";
 	}
 	std::cout << std::endl;
 	std::cout << std::endl;
+
 	std::cout << "Arc Graph" << std::endl;
 	for (auto& i : arcGraph.TopologicalSort()) {
 		std::cout << i << " ";
